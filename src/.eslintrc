@@ -7,6 +7,12 @@
     "plugins": ["prettier","jsx-a11y"],
     "parser": "babel-eslint",
     "env": {
-        "browser": true
+        "browser": true,
+        "es6": true
+    },
+    "rules": {
+        "camelcase": ["error", {"allow": ["UNSAFE_componentWillMount"]}],
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+        "no-console": ["error", { "allow": ["warn", "error", "log"] }]
     }
 }
