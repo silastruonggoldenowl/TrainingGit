@@ -1,4 +1,4 @@
-import STASK from "../constans";
+import STASK from "../constans/staskConstans";
 
 function getStaskReducer(state) {
   return {
@@ -8,7 +8,7 @@ function getStaskReducer(state) {
 }
 
 function onClickTickAll(state) {
-  const dataState = state.data;
+  const dataState = { ...state.data };
   let check;
 
   if (Object.values(dataState).every((item) => item.isTick === true)) {
@@ -17,9 +17,8 @@ function onClickTickAll(state) {
     check = true;
   }
 
-  Object.values(dataState).map((item) => {
+  Object.values(dataState).forEach((item) => {
     dataState[item.id].isTick = check;
-    return item;
   });
   return {
     ...state,
@@ -28,16 +27,20 @@ function onClickTickAll(state) {
 }
 
 function onClickTick(state, id) {
-  const dataState = state.data;
-  dataState[id].isTick = !dataState[id].isTick;
   return {
     ...state,
-    data: dataState,
+    data: {
+      ...state.data,
+      [id]: {
+        ...state.data[id],
+        isTick: !state.data[id].isTick,
+      },
+    },
   };
 }
 
 function deleteStaskReducer(state, id) {
-  const dataState = state.data;
+  const dataState = { ...state.data };
   delete dataState[id];
   return {
     ...state,
@@ -46,21 +49,23 @@ function deleteStaskReducer(state, id) {
 }
 
 function addStaskReducer(state, data) {
-  const dataState = state.data;
+  const dataState = { ...state.data };
   dataState[data.id] = data;
   return {
     ...state,
-    data: dataState,
+    data: {
+      ...state.data,
+      [data.id]: data,
+    },
   };
 }
 
 function deleteAllStaskReducer(state) {
-  const dataState = state.data;
-  Object.values(dataState).map((item) => {
+  const dataState = { ...state.data };
+  Object.values(dataState).forEach((item) => {
     if (item.isTick === true) {
       delete dataState[item.id];
     }
-    return item;
   });
   return {
     ...state,

@@ -1,4 +1,4 @@
-import STASK from "../constans";
+import STASK from "../constans/staskConstans";
 
 export const addStask = (data) => ({
   type: STASK.ADD,

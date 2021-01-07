@@ -10,7 +10,8 @@ import {
   tick,
   tickAll,
   deleteAllStask,
-} from "./Store/actions";
+} from "./Store/actions/staskActions";
+import { logOutAction } from "./Store/actions/authActions";
 
 class App extends React.Component {
   constructor(props) {
@@ -151,7 +152,7 @@ class App extends React.Component {
   };
 
   render() {
-    const { staskState } = this.props;
+    const { staskState, logOut } = this.props;
     // console.log(Object.keys(staskState.data));
     // if (!staskState?.data) {
     //   return <Loading/>
@@ -160,6 +161,9 @@ class App extends React.Component {
       <div className="todo-list">
         <this.header name="Todos" />
         <this.todoTable data={staskState.data || []} />
+        <div onClick={logOut} aria-hidden="true">
+          Log Out
+        </div>
       </div>
     );
   }
@@ -188,10 +192,14 @@ const mapDispatchToProps = (dispatch) => ({
   deleteAllStaskHandler: () => {
     dispatch(deleteAllStask());
   },
+  logOut: () => {
+    dispatch(logOutAction());
+  },
 });
 
 App.defaultProps = {
   staskState: {},
+  logOut: undefined,
   getStaskHandler: undefined,
   deleteAllStaskHandler: undefined,
   tickAllHandler: undefined,
@@ -202,6 +210,7 @@ App.defaultProps = {
 
 App.propTypes = {
   staskState: PropTypes.objectOf(PropTypes.object),
+  logOut: PropTypes.func,
   getStaskHandler: PropTypes.func,
   deleteAllStaskHandler: PropTypes.func,
   tickAllHandler: PropTypes.func,

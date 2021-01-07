@@ -1,19 +1,23 @@
+import React from "react";
+import { connect } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
 import { PropTypes } from "prop-types";
-import React from "react";
 
-function PrivateRoute({ children }) {
-  const isOK = true;
+function PrivateRoute({ children, ...rest }) {
+  const { signIn } = rest.authState;
+  const { path, location } = rest;
   return (
     <Route
-      render={({ location }) => {
-        return isOK ? (
+      path={path}
+      location={location}
+      render={() => {
+        return signIn ? (
           children
         ) : (
           <Redirect
             to={{
               pathname: "/login",
-              state: { from: location },
+              state: { from: path },
             }}
           />
         );
@@ -30,4 +34,8 @@ PrivateRoute.propTypes = {
   children: PropTypes.objectOf(PropTypes.object),
 };
 
-export default PrivateRoute;
+const mapStateToProps = (state) => ({
+  authState: state.authState,
+});
+
+export default connect(mapStateToProps)(PrivateRoute);

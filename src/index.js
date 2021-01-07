@@ -24,6 +24,9 @@ ReactDOM.render(
           <PrivateRoute path="/">
             <App />
           </PrivateRoute>
+          <Route path="*">
+            <>No Match</>
+          </Route>
         </Switch>
       </BrowserRouter>
     </PersistGate>
