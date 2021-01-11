@@ -25,8 +25,11 @@ class Login extends React.Component {
       errors,
       handleSubmit,
       handleChange,
+      touched,
       handleBlur,
     } = props;
+    const a = {};
+    console.log(a.b.c);
     return (
       <form onSubmit={handleSubmit}>
         <div className="todo-list">
@@ -38,7 +41,7 @@ class Login extends React.Component {
             onChange={handleChange}
             onBlur={handleBlur}
           />
-          <div>{errors.email}</div>
+          <div>{errors.email && touched.email && errors.email}</div>
           <input
             className="border border-1 p-2 my-1"
             placeholder="Mật khẩu"
@@ -47,7 +50,7 @@ class Login extends React.Component {
             onChange={handleChange}
             onBlur={handleBlur}
           />
-          <div>{errors.password}</div>
+          <div>{errors.password && touched.password && errors.password}</div>
           <button type="submit" disabled={isSubmitting}>
             Đăng Nhập
           </button>
@@ -59,7 +62,7 @@ class Login extends React.Component {
   onClickSignInWithFB = () => {
     firebaseConfig.firebase
       .auth()
-      .signInWithPopup(firebaseConfig.provider)
+      .signInWithPopup(firebaseConfig.FBProvider)
       .then(this.handlerLoginWithFB);
   };
 

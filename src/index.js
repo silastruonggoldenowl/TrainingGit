@@ -12,23 +12,36 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "tailwindcss/dist/tailwind.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import PrivateRoute from "./PrivateRouter";
+import Sentry from "./configSentry";
+
+function fallbackComponent({ error, componentStack }) {
+  return (
+    <>
+      <div>You have encountered an error</div>
+      <div>{error.toString()}</div>
+      <div>{componentStack}</div>
+    </>
+  );
+}
 
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/login">
-            <Login />
-          </Route>
-          <PrivateRoute path="/">
-            <App />
-          </PrivateRoute>
-          <Route path="*">
-            <>No Match</>
-          </Route>
-        </Switch>
-      </BrowserRouter>
+      <Sentry.ErrorBoundary fallback={fallbackComponent}>
+        <BrowserRouter>
+          <Switch>
+            <Route path="/login">
+              <Login />
+            </Route>
+            <PrivateRoute path="/">
+              <App />
+            </PrivateRoute>
+            <Route path="*">
+              <>No Match</>
+            </Route>
+          </Switch>
+        </BrowserRouter>
+      </Sentry.ErrorBoundary>
     </PersistGate>
   </Provider>,
   document.getElementById("root")

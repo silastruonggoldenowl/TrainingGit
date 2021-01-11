@@ -17,10 +17,10 @@ try {
   console.log(error);
 }
 
-const provider = new firebase.auth.FacebookAuthProvider();
-provider.addScope("user_birthday");
-provider.setCustomParameters({
+const FBProvider = new firebase.auth.FacebookAuthProvider();
+FBProvider.addScope("user_birthday");
+FBProvider.setCustomParameters({
   display: "popup",
 });
 
-export default { firebase, provider };
+export default { firebase, FBProvider };
