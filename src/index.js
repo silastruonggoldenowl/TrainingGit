@@ -5,13 +5,13 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
-import { persistor, store } from "./configureReduxPersisGate";
+import { persistor, store } from "./config/configureReduxPersisGate";
 import { Login, Todos } from "./Pages";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "tailwindcss/dist/tailwind.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { PrivateRouter } from "./Components";
-import Sentry from "./configSentry";
+import PrivateRouter from "./router";
+import Sentry from "./config/configSentry";
 
 function fallbackComponent({ error, componentStack }) {
   return (
