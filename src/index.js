@@ -4,14 +4,13 @@ import "./index.css";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { persistor, store } from "./configureReduxPersisGate";
-import Login from "./pages/login";
+import { Login, Todos } from "./Pages";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "tailwindcss/dist/tailwind.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import PrivateRoute from "./PrivateRouter";
+import { PrivateRouter } from "./Components";
 import Sentry from "./configSentry";
 
 function fallbackComponent({ error, componentStack }) {
@@ -33,9 +32,9 @@ ReactDOM.render(
             <Route path="/login">
               <Login />
             </Route>
-            <PrivateRoute path="/">
-              <App />
-            </PrivateRoute>
+            <PrivateRouter path="/">
+              <Todos />
+            </PrivateRouter>
             <Route path="*">
               <>No Match</>
             </Route>

@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Formik } from "formik";
 import firebaseConfig from "../firebaseConfig";
-import { logInAction } from "../Store/actions/authActions";
+import { logInAction } from "../store/actions/authActions";
 
 class Login extends React.Component {
   constructor() {
@@ -28,8 +28,8 @@ class Login extends React.Component {
       touched,
       handleBlur,
     } = props;
-    const a = {};
-    console.log(a.b.c);
+    // const a = {};
+    // console.log(a.b.c);
     return (
       <form onSubmit={handleSubmit}>
         <div className="todo-list">

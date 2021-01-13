@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Loading() {
+function Loading() {
   return (
     <>
       <div className="display-2 d-flex align-items-center justify-content-center">
@@ -9,3 +9,5 @@ export default function Loading() {
     </>
   );
 }
+
+export default Loading;
