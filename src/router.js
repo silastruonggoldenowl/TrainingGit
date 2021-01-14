@@ -1,41 +1,52 @@
 import React from "react";
-import { connect } from "react-redux";
-import { Route, Redirect } from "react-router-dom";
-import PropTypes from "prop-types";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Login, Todos } from "./pages";
+import PrivateRouter from "./privateRouter";
 
-function PrivateRoute({ children, ...rest }) {
-  const { signIn } = rest.authState;
-  const { path, location } = rest;
-  return (
+const routes = {
+  login: {
+    path: "/login",
+    component: Login,
+    private: false,
+  },
+  home: {
+    path: "/",
+    component: Todos,
+    private: true,
+  },
+  noMatch: {
+    path: "*",
+    component: <>No Match</>,
+    private: false,
+  },
+};
+
+function RouteWithSubRoutes(route) {
+  return !route.priavte ? (
     <Route
-      path={path}
-      location={location}
-      render={() => {
-        return signIn ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: path },
-            }}
-          />
-        );
-      }}
+      path={route.path}
+      render={() => <route.component component={route.component} />}
     />
+  ) : (
+    <PrivateRouter path={route.path}>
+      <route.component component={route.component} />
+    </PrivateRouter>
   );
 }
 
-PrivateRoute.defaultProps = {
-  children: {},
-};
-
-PrivateRoute.propTypes = {
-  children: PropTypes.symbol,
-};
-
-const mapStateToProps = (state) => ({
-  authState: state.authState,
-});
-
-export default connect(mapStateToProps)(PrivateRoute);
+export default function RouteConfig() {
+  return (
+    <Router>
+      <Switch>
+        {Object.values(routes).map((route) => (
+          <RouteWithSubRoutes
+            key={route.path}
+            path={route.path}
+            component={route.component}
+            priavte={route.private}
+          />
+        ))}
+      </Switch>
+    </Router>
+  );
+}
