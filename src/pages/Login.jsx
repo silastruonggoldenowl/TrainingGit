@@ -114,13 +114,29 @@ const mapStateToProps = (state) => ({
 
 Login.defaultProps = {
   logInHandler: undefined,
-  authState: {},
-  location: {},
+  authState: {
+    signIn: false,
+  },
+  location: {
+    state: {
+      from: "/",
+    },
+  },
 };
 
 Login.propTypes = {
-  authState: PropTypes.objectOf(PropTypes.object),
-  location: PropTypes.objectOf(PropTypes.object),
+  authState: PropTypes.exact({
+    signIn: PropTypes.bool,
+  }),
+  location: PropTypes.exact({
+    state: PropTypes.exact({
+      from: PropTypes.string,
+    }),
+    pathname: PropTypes.string,
+    search: PropTypes.string,
+    hash: PropTypes.string,
+    key: PropTypes.string,
+  }),
   logInHandler: PropTypes.func,
 };
 

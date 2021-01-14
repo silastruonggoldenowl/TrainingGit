@@ -31,7 +31,7 @@ PrivateRoute.defaultProps = {
 };
 
 PrivateRoute.propTypes = {
-  children: PropTypes.objectOf(PropTypes.object),
+  children: PropTypes.symbol,
 };
 
 const mapStateToProps = (state) => ({

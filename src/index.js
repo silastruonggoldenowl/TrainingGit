@@ -8,7 +8,6 @@ import reportWebVitals from "./reportWebVitals";
 import { persistor, store } from "./config/configReduxPersisGate";
 import { Login, Todos } from "./pages";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "tailwindcss/dist/tailwind.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import PrivateRouter from "./router";
 import Sentry from "./config/configSentry";
