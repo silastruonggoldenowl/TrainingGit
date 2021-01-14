@@ -28,8 +28,6 @@ class Login extends React.Component {
       touched,
       handleBlur,
     } = props;
-    const a = {};
-    console.log(a.b.c);
     return (
       <form onSubmit={handleSubmit}>
         <div className="todo-list">
