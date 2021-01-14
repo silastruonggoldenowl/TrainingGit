@@ -1,10 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
-import { PropTypes } from "prop-types";
+import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Formik } from "formik";
-import firebaseConfig from "../firebaseConfig";
+import firebaseConfig from "../config/configFirebase";
 import { logInAction } from "../store/actions/authActions";
 
 class Login extends React.Component {
@@ -28,8 +28,6 @@ class Login extends React.Component {
       touched,
       handleBlur,
     } = props;
-    // const a = {};
-    // console.log(a.b.c);
     return (
       <form onSubmit={handleSubmit}>
         <div className="todo-list">

@@ -1,5 +1,5 @@
 import React from "react";
-import { PropTypes } from "prop-types";
+import PropTypes from "prop-types";
 import { uuid } from "uuidv4";
 import classnames from "classnames";
 import { connect } from "react-redux";
