@@ -1,14 +1,27 @@
 import AUTH from "../constans/authConstans";
 
-export const logInAction = (data) => {
+export const signInAction = (data) => {
   return {
-    type: AUTH.LOG_IN,
+    type: AUTH.SIGN_IN,
     data,
   };
 };
 
-export const logOutAction = () => {
+export const signOutAction = () => {
   return {
-    type: AUTH.LOG_OUT,
+    type: AUTH.SIGN_OUT,
+  };
+};
+
+export const signUpAction = () => {
+  return {
+    type: AUTH.SIGN_UP,
+  };
+};
+
+export const signInWithFbAction = (data) => {
+  return {
+    type: AUTH.SIGN_IN_WITH_FB,
+    data,
   };
 };

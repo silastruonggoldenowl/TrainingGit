@@ -5,18 +5,21 @@ import { Redirect } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Formik } from "formik";
 import firebaseConfig from "../firebaseConfig";
-import { logInAction } from "../Store/actions/authActions";
+import { signInAction } from "../Store/actions/authActions";
 
-class Login extends React.Component {
+class Register extends React.Component {
   constructor() {
     super();
     this.state = {};
   }
 
   onSubmitForm = (values) => {
-    const { logInHandler } = this.props;
+    const { logUpHandler } = this.props;
     const { email, password } = values;
-    logInHandler({ email, password });
+    firebaseConfig.firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(logUpHandler());
   };
 
   formView = (props) => {
@@ -28,22 +31,22 @@ class Login extends React.Component {
       touched,
       handleBlur,
     } = props;
-    const a = {};
-    console.log(a.b.c);
+    // const a = {};
+    // console.log(a.b.c);
     return (
       <form onSubmit={handleSubmit}>
-        <div className="todo-list">
-          <h2>Đăng Nhập</h2>
+        <div className="">
+          <h2 className="display-4 font-weight-bold mb-3">Sign Up</h2>
           <input
-            className="border border-1 p-2 my-1"
+            className="border border-1 p-2 my-1 w-100 form-control"
             placeholder="Tên đăng nhập"
             name="email"
             onChange={handleChange}
             onBlur={handleBlur}
           />
-          <div>{errors.email && touched.email && errors.email}</div>
+          <div>{(errors.email && touched.email && errors.email) || " "}</div>
           <input
-            className="border border-1 p-2 my-1"
+            className="border border-1 p-2 my-1 w-100 form-control"
             placeholder="Mật khẩu"
             name="password"
             type="Password"
@@ -51,23 +54,43 @@ class Login extends React.Component {
             onBlur={handleBlur}
           />
           <div>{errors.password && touched.password && errors.password}</div>
-          <button type="submit" disabled={isSubmitting}>
-            Đăng Nhập
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="btn btn-primary my-1 w-100"
+          >
+            Sign Up
           </button>
+
+          <div
+            onClick={this.onClickSignUpWithFB}
+            aria-hidden="true"
+            className="btn btn-success my-1 w-100"
+          >
+            Sign up with FB
+          </div>
         </div>
       </form>
     );
   };
 
-  onClickSignInWithFB = () => {
+  onClickSignUpWithFB = () => {
     firebaseConfig.firebase
       .auth()
       .signInWithPopup(firebaseConfig.FBProvider)
-      .then(this.handlerLoginWithFB);
+      .then(this.handlerSignUpWithFB)
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
-  handlerLoginWithFB = async (result) => {
+  handlerSignUpWithFB = async (result) => {
+    // const { signInWithFB } = this.props;
     console.log(result);
+    // signInWithFB({
+    //   email: result.user.email,
+    //   username: result.user.displayName,
+    // });
   };
 
   render() {
@@ -76,11 +99,9 @@ class Login extends React.Component {
       return <Redirect to={location?.state?.from || "/"} />;
     }
     return (
-      <>
-        <div onClick={this.onClickSignInWithFB} aria-hidden="true">
-          Đăng nhập với FB
-        </div>
+      <div className="todo-list text-center">
         <Formik
+          className="w-100"
           initialValues={{ email: "", password: "" }}
           validate={(values) => {
             const errors = {};
@@ -100,30 +121,33 @@ class Login extends React.Component {
         >
           {this.formView}
         </Formik>
-      </>
+      </div>
     );
   }
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  logInHandler: (data) => {
-    dispatch(logInAction(data));
+  logUpHandler: (data) => {
+    dispatch(signInAction(data));
   },
 });
 const mapStateToProps = (state) => ({
   authState: state.authState,
 });
 
-Login.defaultProps = {
-  logInHandler: undefined,
+Register.defaultProps = {
+  logUpHandler: undefined,
   authState: {},
   location: {},
 };
 
-Login.propTypes = {
+Register.propTypes = {
   authState: PropTypes.objectOf(PropTypes.object),
   location: PropTypes.objectOf(PropTypes.object),
-  logInHandler: PropTypes.func,
+  logUpHandler: PropTypes.func,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Login));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(Register));

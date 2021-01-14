@@ -7,7 +7,7 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { persistor, store } from "./configureReduxPersisGate";
-import Login from "./pages/login";
+import { Login, Register } from "./pages";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "tailwindcss/dist/tailwind.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -32,6 +32,9 @@ ReactDOM.render(
           <Switch>
             <Route path="/login">
               <Login />
+            </Route>
+            <Route path="/register">
+              <Register />
             </Route>
             <PrivateRoute path="/">
               <App />

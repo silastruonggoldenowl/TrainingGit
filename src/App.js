@@ -11,7 +11,8 @@ import {
   tickAll,
   deleteAllStask,
 } from "./Store/actions/staskActions";
-import { logOutAction } from "./Store/actions/authActions";
+import firebaseConfig from "./firebaseConfig";
+import { signOutAction } from "./Store/actions/authActions";
 
 class App extends React.Component {
   constructor(props) {
@@ -151,8 +152,13 @@ class App extends React.Component {
     );
   };
 
+  onClickLogOut = () => {
+    const { logOut } = this.props;
+    firebaseConfig.firebase.auth().signOut().then(logOut);
+  };
+
   render() {
-    const { staskState, logOut } = this.props;
+    const { staskState } = this.props;
     // console.log(Object.keys(staskState.data));
     // if (!staskState?.data) {
     //   return <Loading/>
@@ -161,7 +167,7 @@ class App extends React.Component {
       <div className="todo-list">
         <this.header name="Todos" />
         <this.todoTable data={staskState.data || []} />
-        <div onClick={logOut} aria-hidden="true">
+        <div onClick={this.onClickLogOut} aria-hidden="true">
           Log Out
         </div>
       </div>
@@ -193,7 +199,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(deleteAllStask());
   },
   logOut: () => {
-    dispatch(logOutAction());
+    dispatch(signOutAction());
   },
 });
 
