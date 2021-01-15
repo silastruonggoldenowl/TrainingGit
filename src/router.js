@@ -9,26 +9,28 @@ import {
 import PropTypes from "prop-types";
 import { Login, Todos } from "./pages";
 
-const routes = {
-  login: {
-    path: "/login",
-    component: Login,
-    private: false,
-  },
+const routesConfig = {
   home: {
     path: "/",
     component: Todos,
-    private: true,
-  },
-  noMatch: {
-    path: "*",
-    component: <>No Match</>,
-    private: false,
+    privateRoute: true,
+    routes: {
+      login: {
+        path: "/login",
+        component: Login,
+        privateRoute: false,
+      },
+    },
+    noMatch: {
+      path: "*",
+      component: <>No Match</>,
+      privateRoute: false,
+    },
   },
 };
 
-function RouteWithSubRoutes(route) {
-  return !route.priavte ? (
+function RouteWrap(route) {
+  return !route.privateRoute ? (
     <Route
       path={route.path}
       render={() => <route.component component={route.component} />}
@@ -36,10 +38,34 @@ function RouteWithSubRoutes(route) {
   ) : (
     <Redirect
       to={{
-        pathname: routes.login.path,
+        pathname: routesConfig.home.routes.login.path,
         state: { from: route.path },
       }}
     />
+  );
+}
+
+function RouteWithSubRoutes(props) {
+  const { routes, path, component, privateRoute } = props;
+  return (
+    <>
+      {routes &&
+        Object.values(routes).map((route) => (
+          <RouteWithSubRoutes
+            key={route.path}
+            path={route.path}
+            component={route.component}
+            privateRoute={route.privateRoute}
+            routes={route.routes}
+          />
+        ))}
+      <RouteWrap
+        path={path}
+        component={component}
+        privateRoute={privateRoute}
+        routes={routes}
+      />
+    </>
   );
 }
 
@@ -48,12 +74,13 @@ function RouteConfig(props) {
   return (
     <Router>
       <Switch>
-        {Object.values(routes).map((route) => (
+        {Object.values(routesConfig).map((route) => (
           <RouteWithSubRoutes
             key={route.path}
             path={route.path}
             component={route.component}
-            priavte={route.private && !authState.signIn}
+            privateRoute={route.privateRoute && !authState.signIn}
+            routes={route.routes}
           />
         ))}
       </Switch>
@@ -71,6 +98,20 @@ RouteConfig.propTypes = {
   authState: PropTypes.exact({
     signIn: PropTypes.bool,
   }),
+};
+
+RouteWithSubRoutes.defaultProps = {
+  routes: {},
+  path: "",
+  component: {},
+  privateRoute: false,
+};
+
+RouteWithSubRoutes.propTypes = {
+  routes: PropTypes.objectOf(PropTypes.object),
+  path: PropTypes.string,
+  component: PropTypes.symbol,
+  privateRoute: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
