@@ -4,8 +4,8 @@ import { PropTypes } from "prop-types";
 import { Redirect } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Formik } from "formik";
-import firebaseConfig from "../firebaseConfig";
-import { signInAction } from "../Store/actions/authActions";
+import firebaseConfig from "../config/configFirebase";
+import { signInAction } from "../store/actions/authActions";
 
 class Register extends React.Component {
   constructor() {

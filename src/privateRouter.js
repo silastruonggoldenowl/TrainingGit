@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
-import { PropTypes } from "prop-types";
+import PropTypes from "prop-types";
 
 function PrivateRoute({ children, ...rest }) {
   const { signIn } = rest.authState;
@@ -31,7 +31,7 @@ PrivateRoute.defaultProps = {
 };
 
 PrivateRoute.propTypes = {
-  children: PropTypes.objectOf(PropTypes.object),
+  children: PropTypes.symbol,
 };
 
 const mapStateToProps = (state) => ({
