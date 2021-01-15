@@ -1,7 +1,13 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { connect } from "react-redux";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import PropTypes from "prop-types";
 import { Login, Todos } from "./pages";
-import PrivateRouter from "./privateRouter";
 
 const routes = {
   login: {
@@ -28,13 +34,17 @@ function RouteWithSubRoutes(route) {
       render={() => <route.component component={route.component} />}
     />
   ) : (
-    <PrivateRouter path={route.path}>
-      <route.component component={route.component} />
-    </PrivateRouter>
+    <Redirect
+      to={{
+        pathname: routes.login.path,
+        state: { from: route.path },
+      }}
+    />
   );
 }
 
-export default function RouteConfig() {
+function RouteConfig(props) {
+  const { authState } = props;
   return (
     <Router>
       <Switch>
@@ -43,10 +53,28 @@ export default function RouteConfig() {
             key={route.path}
             path={route.path}
             component={route.component}
-            priavte={route.private}
+            priavte={route.private && !authState.signIn}
           />
         ))}
       </Switch>
     </Router>
   );
 }
+
+RouteConfig.defaultProps = {
+  authState: {
+    signIn: false,
+  },
+};
+
+RouteConfig.propTypes = {
+  authState: PropTypes.exact({
+    signIn: PropTypes.bool,
+  }),
+};
+
+const mapStateToProps = (state) => ({
+  authState: state.authState,
+});
+
+export default connect(mapStateToProps)(RouteConfig);
