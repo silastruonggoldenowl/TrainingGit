@@ -10,62 +10,65 @@ import PropTypes from "prop-types";
 import { Login, Todos } from "./pages";
 
 const routesConfig = {
+  login: {
+    path: "/login",
+    component: Login,
+    privateRoute: false,
+  },
+  test: {
+    path: "/test",
+    component: () => <div>Test</div>,
+    routes: {
+      testSentry: {
+        path: "/test/sentry",
+        component: () => <div>test Sentry</div>,
+      },
+    },
+  },
   home: {
     path: "/",
     component: Todos,
     privateRoute: true,
-    routes: {
-      login: {
-        path: "/login",
-        component: Login,
-        privateRoute: false,
-      },
-    },
-    noMatch: {
-      path: "*",
-      component: <>No Match</>,
-      privateRoute: false,
-    },
+  },
+  noMatch: {
+    path: "*",
+    component: () => <div>No Match</div>,
+    privateRoute: false,
   },
 };
 
-function RouteWrap(route) {
-  return !route.privateRoute ? (
+function RouteWithSubRoutes(route) {
+  return (
     <Route
       path={route.path}
-      render={() => <route.component component={route.component} />}
-    />
-  ) : (
-    <Redirect
-      to={{
-        pathname: routesConfig.home.routes.login.path,
-        state: { from: route.path },
+      render={() => {
+        return !route.privateRoute ? (
+          <>
+            <route.component component={route.component} />
+            {route.routes && (
+              <Switch>
+                {Object.values(route.routes).map((prop) => (
+                  <RouteWithSubRoutes
+                    key={prop.path}
+                    path={prop.path}
+                    component={prop.component}
+                    privateRoute={prop.privateRoute}
+                    routes={prop.routes}
+                  />
+                ))}
+              </Switch>
+            )}
+          </>
+        ) : (
+          <Redirect
+            to={{
+              pathname: routesConfig.login.path,
+              state: { from: route.path },
+            }}
+          />
+        );
       }}
     />
-  );
-}
-
-function RouteWithSubRoutes(props) {
-  const { routes, path, component, privateRoute } = props;
-  return (
-    <>
-      {routes &&
-        Object.values(routes).map((route) => (
-          <RouteWithSubRoutes
-            key={route.path}
-            path={route.path}
-            component={route.component}
-            privateRoute={route.privateRoute}
-            routes={route.routes}
-          />
-        ))}
-      <RouteWrap
-        path={path}
-        component={component}
-        privateRoute={privateRoute}
-        routes={routes}
-      />
-    </>
   );
 }
 
@@ -100,19 +103,9 @@ RouteConfig.propTypes = {
   }),
 };
 
-RouteWithSubRoutes.defaultProps = {
-  routes: {},
-  path: "",
-  component: {},
-  privateRoute: false,
-};
+// RouteWithSubRoutes.defaultProps = {};
 
-RouteWithSubRoutes.propTypes = {
-  routes: PropTypes.objectOf(PropTypes.object),
-  path: PropTypes.string,
-  component: PropTypes.symbol,
-  privateRoute: PropTypes.bool,
-};
+// RouteWithSubRoutes.propTypes = {};
 
 const mapStateToProps = (state) => ({
   authState: state.authState,
