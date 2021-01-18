@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Formik } from "formik";
 import firebaseConfig from "../config/configFirebase";
-import { signInAction } from "../store/actions/authActions";
+import { signUpAction, signInWithFbAction } from "../store/actions/authActions";
 
 class Register extends React.Component {
   constructor() {
@@ -14,12 +14,18 @@ class Register extends React.Component {
   }
 
   onSubmitForm = (values) => {
+    // eslint-disable-next-line no-unused-vars
     const { logUpHandler } = this.props;
     const { email, password } = values;
     firebaseConfig.firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(logUpHandler());
+      .then(() => {
+        logUpHandler();
+      })
+      .catch((err) => {
+        alert(err);
+      });
   };
 
   formView = (props) => {
@@ -31,15 +37,14 @@ class Register extends React.Component {
       touched,
       handleBlur,
     } = props;
-    // const a = {};
-    // console.log(a.b.c);
+
     return (
       <form onSubmit={handleSubmit}>
         <div className="">
           <h2 className="display-4 font-weight-bold mb-3">Sign Up</h2>
           <input
             className="border border-1 p-2 my-1 w-100 form-control"
-            placeholder="Tên đăng nhập"
+            placeholder="Username"
             name="email"
             onChange={handleChange}
             onBlur={handleBlur}
@@ -47,7 +52,7 @@ class Register extends React.Component {
           <div>{(errors.email && touched.email && errors.email) || " "}</div>
           <input
             className="border border-1 p-2 my-1 w-100 form-control"
-            placeholder="Mật khẩu"
+            placeholder="Password"
             name="password"
             type="Password"
             onChange={handleChange}
@@ -67,7 +72,7 @@ class Register extends React.Component {
             aria-hidden="true"
             className="btn btn-success my-1 w-100"
           >
-            Sign up with FB
+            Sign in with FB
           </div>
         </div>
       </form>
@@ -78,19 +83,15 @@ class Register extends React.Component {
     firebaseConfig.firebase
       .auth()
       .signInWithPopup(firebaseConfig.FBProvider)
-      .then(this.handlerSignUpWithFB)
+      .then(this.handlerLoginWithFB)
       .catch((error) => {
         console.log(error);
       });
   };
 
-  handlerSignUpWithFB = async (result) => {
-    // const { signInWithFB } = this.props;
-    console.log(result);
-    // signInWithFB({
-    //   email: result.user.email,
-    //   username: result.user.displayName,
-    // });
+  handlerLoginWithFB = async (result) => {
+    const { signInWithFB } = this.props;
+    signInWithFB(result.user.email);
   };
 
   render() {
@@ -128,7 +129,10 @@ class Register extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   logUpHandler: (data) => {
-    dispatch(signInAction(data));
+    dispatch(signUpAction(data));
+  },
+  signInWithFB: (data) => {
+    dispatch(signInWithFbAction(data));
   },
 });
 const mapStateToProps = (state) => ({
@@ -139,12 +143,14 @@ Register.defaultProps = {
   logUpHandler: undefined,
   authState: {},
   location: {},
+  signInWithFB: undefined,
 };
 
 Register.propTypes = {
   authState: PropTypes.objectOf(PropTypes.object),
   location: PropTypes.objectOf(PropTypes.object),
   logUpHandler: PropTypes.func,
+  signInWithFB: PropTypes.func,
 };
 
 export default connect(
