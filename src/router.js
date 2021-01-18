@@ -49,19 +49,7 @@ function RouteWithSubRoutes(route) {
         return !route.privateRoute ? (
           <>
             <route.component component={route.component} />
-            {route.routes && (
-              <Switch>
-                {Object.values(route.routes).map((prop) => (
-                  <RouteWithSubRoutes
-                    key={prop.path}
-                    path={prop.path}
-                    component={prop.component}
-                    privateRoute={prop.privateRoute}
-                    routes={prop.routes}
-                  />
-                ))}
-              </Switch>
-            )}
+            {route.routes && <RouteConfig routes={route.routes} />}
           </>
         ) : (
           <Redirect
@@ -77,11 +65,12 @@ function RouteWithSubRoutes(route) {
 }
 
 function RouteConfig(props) {
-  const { authState } = props;
+  const { authState, routes } = props;
+  const routesParam = routes || routesConfig;
   return (
     <Router>
       <Switch>
-        {Object.values(routesConfig).map((route) => (
+        {Object.values(routesParam).map((route) => (
           <RouteWithSubRoutes
             key={route.path}
             path={route.path}
@@ -99,12 +88,14 @@ RouteConfig.defaultProps = {
   authState: {
     signIn: false,
   },
+  routes: undefined,
 };
 
 RouteConfig.propTypes = {
   authState: PropTypes.exact({
     signIn: PropTypes.bool,
   }),
+  routes: PropTypes.objectOf(PropTypes.object),
 };
 
 // RouteWithSubRoutes.defaultProps = {};
