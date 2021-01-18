@@ -10,6 +10,51 @@ import {
 import PropTypes from "prop-types";
 import { Login, Todos } from "./pages";
 
+function RouteConfig(props) {
+  const { routes, authState, ...rest } = props;
+  return (
+    <Router>
+      <Switch>
+        {Object.values(routes).map((route) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            render={() => {
+              return !(!authState.signIn && route.privateRoute) ? (
+                <>
+                  <route.component
+                    routes={route.routes}
+                    authState={authState}
+                    {...rest}
+                  />
+                </>
+              ) : (
+                <Redirect
+                  to={{
+                    pathname: "/login",
+                    state: { from: route.path },
+                  }}
+                />
+              );
+            }}
+          />
+        ))}
+      </Switch>
+    </Router>
+  );
+}
+function SentryComponent(props) {
+  const { routes } = props;
+  console.log(props);
+  return (
+    <>
+      <div>Test Top</div>
+      {routes && RouteConfig(props)}
+      <div>Test Bottom</div>
+    </>
+  );
+}
+
 export const routeConfig = {
   login: {
     path: "/login",
@@ -18,11 +63,15 @@ export const routeConfig = {
   },
   test: {
     path: "/test",
-    component: () => <div>Test</div>,
+    component: SentryComponent,
     routes: {
       testSentry: {
         path: "/test/sentry",
-        component: () => <div>test Sentry</div>,
+        component: () => {
+          // const a = {};
+          // console.log(a.b.c);
+          return <div>test Sentry</div>;
+        },
       },
     },
   },
@@ -37,36 +86,6 @@ export const routeConfig = {
     privateRoute: false,
   },
 };
-function RouteConfig(props) {
-  const { routes, authState, ...rest } = props;
-  return (
-    <Router>
-      <Switch>
-        {Object.values(routes || routeConfig).map((route) => (
-          <Route
-            key={route.path}
-            path={route.path}
-            render={() => {
-              return !(!authState.signIn && route.privateRoute) ? (
-                <>
-                  <route.component routes={route.routes} {...rest} />
-                  {route.routes && RouteConfig(route)}
-                </>
-              ) : (
-                <Redirect
-                  to={{
-                    pathname: routeConfig.login.path,
-                    state: { from: route.path },
-                  }}
-                />
-              );
-            }}
-          />
-        ))}
-      </Switch>
-    </Router>
-  );
-}
 
 RouteConfig.defaultProps = {
   authState: {
@@ -80,8 +99,13 @@ RouteConfig.propTypes = {
   }),
   routes: PropTypes.objectOf(PropTypes.object),
 };
-// RouteWithSubRoutes.defaultProps = {};
-// RouteWithSubRoutes.propTypes = {};
+SentryComponent.defaultProps = {
+  routes: {},
+};
+SentryComponent.propTypes = {
+  routes: PropTypes.objectOf(PropTypes.object),
+};
+
 const mapStateToProps = (state) => ({
   authState: state.authState,
 });
