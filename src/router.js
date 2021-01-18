@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
 import { connect } from "react-redux";
@@ -9,6 +10,39 @@ import {
 } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Login, Todos } from "./pages";
+import SentryComponent from "./components/SentryComponent/SentryComponent";
+
+export const routeConfig = {
+  login: {
+    path: "/login",
+    component: Login,
+    privateRoute: false,
+  },
+  test: {
+    path: "/test",
+    component: SentryComponent,
+    routes: {
+      testSentry: {
+        path: "/test/sentry",
+        component: () => {
+          const a = {};
+          console.log(a.b.c);
+          return <div>test Sentry</div>;
+        },
+      },
+    },
+  },
+  home: {
+    path: "/",
+    component: Todos,
+    privateRoute: true,
+  },
+  noMatch: {
+    path: "*",
+    component: () => <div>No Match</div>,
+    privateRoute: false,
+  },
+};
 
 function RouteConfig(props) {
   const { routes, authState, ...rest } = props;
@@ -31,7 +65,7 @@ function RouteConfig(props) {
               ) : (
                 <Redirect
                   to={{
-                    pathname: "/login",
+                    pathname: routeConfig.login.path,
                     state: { from: route.path },
                   }}
                 />
@@ -43,49 +77,6 @@ function RouteConfig(props) {
     </Router>
   );
 }
-function SentryComponent(props) {
-  const { routes } = props;
-  console.log(props);
-  return (
-    <>
-      <div>Test Top</div>
-      {routes && RouteConfig(props)}
-      <div>Test Bottom</div>
-    </>
-  );
-}
-
-export const routeConfig = {
-  login: {
-    path: "/login",
-    component: Login,
-    privateRoute: false,
-  },
-  test: {
-    path: "/test",
-    component: SentryComponent,
-    routes: {
-      testSentry: {
-        path: "/test/sentry",
-        component: () => {
-          // const a = {};
-          // console.log(a.b.c);
-          return <div>test Sentry</div>;
-        },
-      },
-    },
-  },
-  home: {
-    path: "/",
-    component: Todos,
-    privateRoute: true,
-  },
-  noMatch: {
-    path: "*",
-    component: () => <div>No Match</div>,
-    privateRoute: false,
-  },
-};
 
 RouteConfig.defaultProps = {
   authState: {
@@ -97,12 +88,6 @@ RouteConfig.propTypes = {
   authState: PropTypes.exact({
     signIn: PropTypes.bool,
   }),
-  routes: PropTypes.objectOf(PropTypes.object),
-};
-SentryComponent.defaultProps = {
-  routes: {},
-};
-SentryComponent.propTypes = {
   routes: PropTypes.objectOf(PropTypes.object),
 };
 
