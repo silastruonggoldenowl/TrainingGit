@@ -21,7 +21,11 @@ const routesConfig = {
     routes: {
       testSentry: {
         path: "/test/sentry",
-        component: () => <div>test Sentry</div>,
+        component: () => {
+          const a = {};
+          console.log(a.b.c);
+          return <div>test Sentry</div>;
+        },
       },
     },
   },
