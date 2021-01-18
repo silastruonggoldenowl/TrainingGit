@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
 import { connect } from "react-redux";
 import {
@@ -9,7 +10,7 @@ import {
 import PropTypes from "prop-types";
 import { Login, Todos } from "./pages";
 
-const routesConfig = {
+export const routeConfig = {
   login: {
     path: "/login",
     component: Login,
@@ -21,11 +22,7 @@ const routesConfig = {
     routes: {
       testSentry: {
         path: "/test/sentry",
-        component: () => {
-          const a = {};
-          console.log(a.b.c);
-          return <div>test Sentry</div>;
-        },
+        component: () => <div>test Sentry</div>,
       },
     },
   },
@@ -40,43 +37,30 @@ const routesConfig = {
     privateRoute: false,
   },
 };
-
-function RouteWithSubRoutes(route) {
-  return (
-    <Route
-      path={route.path}
-      render={() => {
-        return !route.privateRoute ? (
-          <>
-            <route.component component={route.component} />
-            {route.routes && <RouteConfig routes={route.routes} />}
-          </>
-        ) : (
-          <Redirect
-            to={{
-              pathname: routesConfig.login.path,
-              state: { from: route.path },
-            }}
-          />
-        );
-      }}
-    />
-  );
-}
-
 function RouteConfig(props) {
-  const { authState, routes } = props;
-  const routesParam = routes || routesConfig;
+  const { routes, authState, ...rest } = props;
   return (
     <Router>
       <Switch>
-        {Object.values(routesParam).map((route) => (
-          <RouteWithSubRoutes
+        {Object.values(routes || routeConfig).map((route) => (
+          <Route
             key={route.path}
             path={route.path}
-            component={route.component}
-            privateRoute={route.privateRoute && !authState.signIn}
-            routes={route.routes}
+            render={() => {
+              return !(!authState.signIn && route.privateRoute) ? (
+                <>
+                  <route.component routes={route.routes} {...rest} />
+                  {route.routes && RouteConfig(route)}
+                </>
+              ) : (
+                <Redirect
+                  to={{
+                    pathname: routeConfig.login.path,
+                    state: { from: route.path },
+                  }}
+                />
+              );
+            }}
           />
         ))}
       </Switch>
@@ -90,20 +74,15 @@ RouteConfig.defaultProps = {
   },
   routes: undefined,
 };
-
 RouteConfig.propTypes = {
   authState: PropTypes.exact({
     signIn: PropTypes.bool,
   }),
   routes: PropTypes.objectOf(PropTypes.object),
 };
-
 // RouteWithSubRoutes.defaultProps = {};
-
 // RouteWithSubRoutes.propTypes = {};
-
 const mapStateToProps = (state) => ({
   authState: state.authState,
 });
-
 export default connect(mapStateToProps)(RouteConfig);
