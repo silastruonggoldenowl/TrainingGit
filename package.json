@@ -1,5 +1,5 @@
 {
-  "name": "traininggit",
+  "name": "training",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -24,7 +24,6 @@
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "redux-saga": "^1.1.3",
-    "tailwindcss": "^2.0.2",
     "uuidv4": "^6.2.6",
     "web-vitals": "^0.2.4"
   },
@@ -60,9 +59,15 @@
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "^2.2.1",
     "typescript": "^4.1.3"
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/silastruonggoldenowl/TrainingGit.git",
+  "author": "<silas.truong.goldenowl@gmail.com>",
+  "license": "MIT"
 }

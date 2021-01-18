@@ -1,11 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
-import { PropTypes } from "prop-types";
+import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Formik } from "formik";
-import firebaseConfig from "../firebaseConfig";
-import { logInAction } from "../Store/actions/authActions";
+import firebaseConfig from "../config/configFirebase";
+import { logInAction } from "../store/actions/authActions";
 
 class Login extends React.Component {
   constructor() {
@@ -28,8 +28,6 @@ class Login extends React.Component {
       touched,
       handleBlur,
     } = props;
-    const a = {};
-    console.log(a.b.c);
     return (
       <form onSubmit={handleSubmit}>
         <div className="todo-list">
@@ -116,13 +114,29 @@ const mapStateToProps = (state) => ({
 
 Login.defaultProps = {
   logInHandler: undefined,
-  authState: {},
-  location: {},
+  authState: {
+    signIn: false,
+  },
+  location: {
+    state: {
+      from: "/",
+    },
+  },
 };
 
 Login.propTypes = {
-  authState: PropTypes.objectOf(PropTypes.object),
-  location: PropTypes.objectOf(PropTypes.object),
+  authState: PropTypes.exact({
+    signIn: PropTypes.bool,
+  }),
+  location: PropTypes.exact({
+    state: PropTypes.exact({
+      from: PropTypes.string,
+    }),
+    pathname: PropTypes.string,
+    search: PropTypes.string,
+    hash: PropTypes.string,
+    key: PropTypes.string,
+  }),
   logInHandler: PropTypes.func,
 };
 
