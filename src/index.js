@@ -8,7 +8,7 @@ import { persistor, store } from "./config/configReduxPersisGate";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Sentry from "./config/configSentry";
-import Router from "./router";
+import Router, { routeConfig } from "./router";
 
 function fallbackComponent({ error, componentStack }) {
   return (
@@ -24,7 +24,7 @@ ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <Sentry.ErrorBoundary fallback={fallbackComponent}>
-        <Router />
+        <Router routes={routeConfig} />
       </Sentry.ErrorBoundary>
     </PersistGate>
   </Provider>,
