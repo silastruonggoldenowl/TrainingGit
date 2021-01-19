@@ -42,12 +42,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "release": "(export REACT_APP_SENTRY_RELEASE=$(git rev-parse --short HEAD); export SENTRY_LOG_LEVEL=info; react-scripts build && node scripts/sentry.js)"
+    "build": "(export REACT_APP_SENTRY_RELEASE=$(git rev-parse --short HEAD); export SENTRY_LOG_LEVEL=info; react-scripts build && node scripts/sentry.js)"
   },
   "eslintConfig": {
     "extends": [
