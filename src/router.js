@@ -1,53 +1,102 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Login from "./pages/login";
-import Todos from "./App";
-import PrivateRouter from "./PrivateRouter";
+import { connect } from "react-redux";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import PropTypes from "prop-types";
+import { Login, Todos, Register } from "./pages";
+import SentryComponent from "./components/SentryComponent/SentryComponent";
 
-const routes = {
+export const routeConfig = {
   login: {
     path: "/login",
     component: Login,
-    private: false,
+    privateRoute: false,
+  },
+  register: {
+    path: "/register",
+    component: Register,
+    privateRoute: false,
+  },
+  test: {
+    path: "/test",
+    component: SentryComponent,
+    routes: {
+      testSentry: {
+        path: "/test/sentry",
+        component: () => {
+          const a = {};
+          console.log(a.b.c);
+          return <div>test Sentry</div>;
+        },
+      },
+    },
   },
   home: {
     path: "/",
     component: Todos,
-    private: true,
+    privateRoute: true,
   },
   noMatch: {
     path: "*",
-    component: <>No Match</>,
-    private: false,
+    component: () => <div>No Match</div>,
+    privateRoute: false,
   },
 };
 
-function RouteWithSubRoutes(route) {
-  return !route.priavte ? (
-    <Route
-      path={route.path}
-      render={() => <route.component component={route.component} />}
-    />
-  ) : (
-    <PrivateRouter path={route.path}>
-      <route.component component={route.component} />
-    </PrivateRouter>
-  );
-}
-
-export default function RouteConfig() {
+function RouteConfig(props) {
+  const { routes, authState, ...rest } = props;
   return (
     <Router>
       <Switch>
         {Object.values(routes).map((route) => (
-          <RouteWithSubRoutes
+          <Route
             key={route.path}
             path={route.path}
-            component={route.component}
-            priavte={route.private}
+            render={() => {
+              return !(!authState.signIn && route.privateRoute) ? (
+                <>
+                  <route.component
+                    routes={route.routes}
+                    authState={authState}
+                    {...rest}
+                  />
+                </>
+              ) : (
+                <Redirect
+                  to={{
+                    pathname: routeConfig.login.path,
+                    state: { from: route.path },
+                  }}
+                />
+              );
+            }}
           />
         ))}
       </Switch>
     </Router>
   );
 }
+
+RouteConfig.defaultProps = {
+  authState: {
+    signIn: false,
+  },
+  routes: undefined,
+};
+RouteConfig.propTypes = {
+  authState: PropTypes.exact({
+    signIn: PropTypes.bool,
+  }),
+  routes: PropTypes.objectOf(PropTypes.object),
+};
+
+const mapStateToProps = (state) => ({
+  authState: state.authState,
+});
+export default connect(mapStateToProps)(RouteConfig);

@@ -4,12 +4,11 @@ import "./index.css";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import reportWebVitals from "./reportWebVitals";
-import { persistor, store } from "./configureReduxPersisGate";
+import { persistor, store } from "./config/configReduxPersisGate";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "tailwindcss/dist/tailwind.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import Sentry from "./configSentry";
-import Router from "./router";
+import Sentry from "./config/configSentry";
+import Router, { routeConfig } from "./router";
 
 function fallbackComponent({ error, componentStack }) {
   return (
@@ -25,7 +24,7 @@ ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <Sentry.ErrorBoundary fallback={fallbackComponent}>
-        <Router />
+        <Router routes={routeConfig} />
       </Sentry.ErrorBoundary>
     </PersistGate>
   </Provider>,
