@@ -29,14 +29,7 @@ class Register extends React.Component {
   };
 
   formView = (props) => {
-    const {
-      isSubmitting,
-      errors,
-      handleSubmit,
-      handleChange,
-      touched,
-      handleBlur,
-    } = props;
+    const { errors, handleSubmit, handleChange, touched, handleBlur } = props;
 
     return (
       <form onSubmit={handleSubmit}>
