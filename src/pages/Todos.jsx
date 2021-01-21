@@ -27,7 +27,7 @@ class App extends React.Component {
     getStaskHandler();
   }
 
-  header = (...props) => <div className="display-3">{props[0].name}</div>;
+  header = (...props) => <div className="display-3 mt-3">{props[0].name}</div>;
 
   onEnterPress = (e) => {
     const { addStaskHandler } = this.props;
@@ -46,6 +46,9 @@ class App extends React.Component {
     const [dataProps] = props;
     const { modeShowComplete, modeShowNotComplete } = this.state;
     const { tickAllHandler, deleteAllStaskHandler } = this.props;
+    const everyTrue = Object.values(dataProps.data).every(
+      (item) => item.isTick === true
+    );
     let dataMode;
     if (modeShowComplete) {
       dataMode = Object.values(dataProps.data).filter(
@@ -56,15 +59,29 @@ class App extends React.Component {
         (item) => item.isTick === false
       );
     }
+
     return (
-      <>
-        <input
-          type="text"
-          defaultValue=""
-          onKeyPress={this.onEnterPress}
-          className="border border-1"
-        />
-        <div className="staskList">
+      <div className="todo-list">
+        <div className="d-flex align-items-end border-bottom w-100">
+          <div
+            onClick={() => tickAllHandler()}
+            aria-hidden="true"
+            className="d-block my-auto"
+          >
+            <i
+              className="far fa-caret-square-down mx-2 pointer"
+              style={{ fontSize: "45px", color: everyTrue ? "black" : "#eee" }}
+            />
+          </div>
+          <input
+            type="text"
+            style={{ height: "50px", fontSize: "30px" }}
+            defaultValue=""
+            onKeyPress={this.onEnterPress}
+            className="w-100 border-0 mx-2 outline-focus-none"
+          />
+        </div>
+        <div className="staskList w-100">
           {!dataMode
             ? Object.values(dataProps.data).map((item) => {
                 return (
@@ -80,25 +97,27 @@ class App extends React.Component {
                   </div>
                 );
               })}
-          <div>
-            <div onClick={() => tickAllHandler()} aria-hidden="true">
-              Select All
+          <div className="d-flex align-items-center justify-content-between font-size-20">
+            <div style={{ width: "150px", textAlign: "center" }}>
+              {`${Object.values(dataProps.data).length} `}
+              item
             </div>
-            <div onClick={() => deleteAllStaskHandler()} aria-hidden="true">
-              Delete All complete
-            </div>
-            <div
-              onClick={() => {
-                this.setState({
-                  modeShowComplete: false,
-                  modeShowNotComplete: false,
-                });
-              }}
-              aria-hidden="true"
-            >
-              Show all stask
-            </div>
-            <div>
+            <div className="d-flex">
+              <div
+                onClick={() => {
+                  this.setState({
+                    modeShowComplete: false,
+                    modeShowNotComplete: false,
+                  });
+                }}
+                className={classnames("px-1 mx-1 pointer", {
+                  "border border-info rounded":
+                    !modeShowComplete && !modeShowNotComplete,
+                })}
+                aria-hidden="true"
+              >
+                All
+              </div>
               <div
                 onClick={() => {
                   this.setState({
@@ -107,47 +126,70 @@ class App extends React.Component {
                   });
                 }}
                 aria-hidden="true"
+                className={classnames("px-1 mx-1 pointer", {
+                  "border border-info rounded": modeShowComplete,
+                })}
               >
-                Show stask complete
+                Completed
+              </div>
+              <div
+                onClick={() => {
+                  this.setState({
+                    modeShowComplete: false,
+                    modeShowNotComplete: true,
+                  });
+                }}
+                className={classnames("px-1 mx-1 pointer", {
+                  "border border-info rounded": modeShowNotComplete,
+                })}
+                aria-hidden="true"
+              >
+                Not complete
               </div>
             </div>
+
             <div
-              onClick={() => {
-                this.setState({
-                  modeShowComplete: false,
-                  modeShowNotComplete: true,
-                });
-              }}
+              style={{ width: "150px", textAlign: "center" }}
+              onClick={() => deleteAllStaskHandler()}
               aria-hidden="true"
+              className="py-3"
             >
-              Show stask not complete
+              Clear complete
             </div>
           </div>
         </div>
-      </>
+      </div>
     );
   };
 
   showStask = (id, isChecked, name) => {
     const { tickCompleteHandler, deleteStaskHandler } = this.props;
     return (
-      <>
-        <div className="d-flex justify-content-center align-items-center">
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={() => tickCompleteHandler(id)}
-          />
-          <div className={classnames({ "line-through": isChecked })}>
+      <div className="border-bottom w-100 font-size-25">
+        <div className="d-flex justify-content-between align-items-center mx-3 my-2">
+          <label htmlFor={`checkbox_${id}`} className="custom-checkbox">
+            <input
+              type="checkbox"
+              name="checkbox"
+              id={`checkbox_${id}`}
+              onChange={() => tickCompleteHandler(id)}
+              checked={isChecked}
+            />
+            <span className="checkmark" />
+          </label>
+          <div
+            className={classnames({ "line-through": isChecked })}
+            style={{ flex: "auto" }}
+          >
             {name}
           </div>
           <i
-            className="fas fa-times"
+            className="fas fa-times pointer"
             onClick={() => deleteStaskHandler(id)}
             aria-hidden="true"
           />
         </div>
-      </>
+      </div>
     );
   };
 
@@ -158,10 +200,14 @@ class App extends React.Component {
     //   return <Loading/>
     // }
     return (
-      <div className="todo-list">
+      <div className="d-flex align-items-center flex-column">
         <this.header name="Todos" />
         <this.todoTable data={staskState.data || []} />
-        <div onClick={logOut} aria-hidden="true">
+        <div
+          className="btn btn-danger log-out"
+          onClick={logOut}
+          aria-hidden="true"
+        >
           Log Out
         </div>
       </div>
