@@ -64,7 +64,7 @@ class Register extends React.Component {
           </Link>
           <button
             type="submit"
-            disabled={isSubmitting}
+            // disabled={isSubmitting}
             className="btn btn-primary my-1 w-100"
           >
             Register
