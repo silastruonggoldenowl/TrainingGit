@@ -1,47 +1,47 @@
 import React from "react";
 import { connect } from "react-redux";
-import PropTypes from "prop-types";
+import { PropTypes } from "prop-types";
 import { Redirect, Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Formik } from "formik";
 import firebaseConfig from "../config/configFirebase";
-import { signInAction, signInWithFbAction } from "../store/actions/authActions";
+import { signUpAction, signInWithFbAction } from "../store/actions/authActions";
 
-class Login extends React.Component {
+class Register extends React.Component {
   constructor() {
     super();
     this.state = {};
   }
 
   onSubmitForm = (values) => {
-    const { logInHandler } = this.props;
+    // eslint-disable-next-line no-unused-vars
+    const { logUpHandler } = this.props;
     const { email, password } = values;
     firebaseConfig.firebase
       .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((result) => {
-        logInHandler({ email: result.user.email });
+      .createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        logUpHandler();
       })
-      .catch((e) => {
-        alert(e.code);
+      .catch((err) => {
+        alert(err);
       });
   };
 
   formView = (props) => {
     const {
-      // isSubmitting,
+      isSubmitting,
       errors,
       handleSubmit,
       handleChange,
       touched,
       handleBlur,
     } = props;
-    // const a = {};
-    // console.log(a.b.c);
+
     return (
       <form onSubmit={handleSubmit}>
         <div className="">
-          <h2 className="display-4 font-weight-bold mb-3">Log In</h2>
+          <h2 className="display-4 font-weight-bold mb-3">Register</h2>
           <input
             className="border border-1 p-2 my-1 w-100 form-control"
             placeholder="Username"
@@ -59,20 +59,19 @@ class Login extends React.Component {
             onBlur={handleBlur}
           />
           <div>{errors.password && touched.password && errors.password}</div>
-
-          <Link to="/register" className="float-right">
-            Register page
+          <Link to="/login" className="float-right">
+            Log in page
           </Link>
           <button
             type="submit"
             // disabled={isSubmitting}
             className="btn btn-primary my-1 w-100"
           >
-            Log in
+            Register
           </button>
 
           <div
-            onClick={this.onClickSignInWithFB}
+            onClick={this.onClickSignUpWithFB}
             aria-hidden="true"
             className="btn btn-success my-1 w-100"
           >
@@ -83,23 +82,19 @@ class Login extends React.Component {
     );
   };
 
-  onClickSignInWithFB = () => {
+  onClickSignUpWithFB = () => {
     firebaseConfig.firebase
       .auth()
       .signInWithPopup(firebaseConfig.FBProvider)
       .then(this.handlerLoginWithFB)
-      .catch((e) => alert(e));
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   handlerLoginWithFB = async (result) => {
     const { signInWithFB } = this.props;
     signInWithFB(result.user.email);
-  };
-
-  onClickSignInWithEmail = () => {
-    firebaseConfig.firebase
-      .auth()
-      .createUserWithEmailAndPassword("example@gmail.com", "123456789");
   };
 
   render() {
@@ -138,8 +133,8 @@ class Login extends React.Component {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  logInHandler: (data) => {
-    dispatch(signInAction(data));
+  logUpHandler: (data) => {
+    dispatch(signUpAction(data));
   },
   signInWithFB: (data) => {
     dispatch(signInWithFbAction(data));
@@ -149,34 +144,21 @@ const mapStateToProps = (state) => ({
   authState: state.authState,
 });
 
-Login.defaultProps = {
-  logInHandler: undefined,
+Register.defaultProps = {
+  logUpHandler: undefined,
+  authState: {},
+  location: {},
   signInWithFB: undefined,
-  authState: {
-    signIn: false,
-  },
-  location: {
-    state: {
-      from: "/",
-    },
-  },
 };
 
-Login.propTypes = {
+Register.propTypes = {
+  authState: PropTypes.objectOf(PropTypes.object),
+  location: PropTypes.objectOf(PropTypes.object),
+  logUpHandler: PropTypes.func,
   signInWithFB: PropTypes.func,
-  authState: PropTypes.exact({
-    signIn: PropTypes.bool,
-  }),
-  location: PropTypes.exact({
-    state: PropTypes.exact({
-      from: PropTypes.string,
-    }),
-    pathname: PropTypes.string,
-    search: PropTypes.string,
-    hash: PropTypes.string,
-    key: PropTypes.string,
-  }),
-  logInHandler: PropTypes.func,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Login));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(Register));

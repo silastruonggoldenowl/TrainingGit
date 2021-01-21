@@ -13,6 +13,7 @@
     "rules": {
         "camelcase": ["error", {"allow": ["UNSAFE_componentWillMount"]}],
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-        "no-console": ["error", { "allow": ["warn", "error", "log"] }]
+        "no-console": ["error", { "allow": ["warn", "error", "log"] }],
+        "no-alert": 0
     }
 }

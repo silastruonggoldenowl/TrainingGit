@@ -9,13 +9,18 @@ import {
   Redirect,
 } from "react-router-dom";
 import PropTypes from "prop-types";
-import { Login, Todos } from "./pages";
+import { Login, Todos, Register } from "./pages";
 import SentryComponent from "./components/SentryComponent/SentryComponent";
 
 export const routeConfig = {
   login: {
     path: "/login",
     component: Login,
+    privateRoute: false,
+  },
+  register: {
+    path: "/register",
+    component: Register,
     privateRoute: false,
   },
   test: {
