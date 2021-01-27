@@ -1,9 +1,13 @@
 import { combineReducers } from "redux";
-import staskState from "./staskReducer";
+import {
+  staskLocalReducer as staskLocalState,
+  staskFirebaseReducer as staskFirebaseState,
+} from "./staskReducer";
 import authState from "./authReducer";
 
 const rootRuducers = combineReducers({
-  staskState,
+  staskLocalState,
+  staskFirebaseState,
   authState,
 });
 

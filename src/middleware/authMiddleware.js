@@ -1,37 +1,34 @@
-// import { uuid } from "uuidv4";
-// import firebaseConfig from "../firebaseConfig";
+import axios from "axios";
 
-// function handlerSignInWithFB(data) {
-//   const username = data.split("@");
-//   firebaseConfig.firebase
-//     .database()
-//     .ref(`/"${username[0]}"`)
-//     .once("value")
-//     .then((result) => (result.val() ? console.log(true) : console.log(false)));
-//   return {};
-// }
+export function getStaskDatabase(id) {
+  return axios.get(
+    `https://todos-758f8-default-rtdb.firebaseio.com/${id}.json?auth=tMP42bwtqN09D5oxY12YkLsDCJZZEq9RWMGYGLNA`
+  );
+}
 
-// export function handlerSignUpWithFB(data) {
-//   firebaseConfig.firebase
-//     .database()
-//     .ref(`/${data.email}`)
-//     .set({
-//       email: data.email,
-//       username: data.name,
-//       id: uuid(),
-//       stask: {},
-//     })
-//     .then((result) => console.log(result));
-//   return {};
-// }
+export function putFullStaskDatabase(id, data) {
+  return axios.put(
+    `https://todos-758f8-default-rtdb.firebaseio.com/${id}/stask.json/?auth=tMP42bwtqN09D5oxY12YkLsDCJZZEq9RWMGYGLNA`,
+    data
+  );
+}
 
-// export function handlerSignInWithEmail(data) {
-//   firebaseConfig.firebase
-//     .auth()
-//     .signInWithEmailAndPassword(data.email, data.password)
-//     .then((result) => console.log(result));
+export function putStaskDatabase(id, data) {
+  return axios.put(
+    `https://todos-758f8-default-rtdb.firebaseio.com/${id}/stask/${data.id}.json/?auth=tMP42bwtqN09D5oxY12YkLsDCJZZEq9RWMGYGLNA`,
+    data
+  );
+}
 
-//   return {};
-// }
+export function deleteStaskDatabase(id, data) {
+  return axios.delete(
+    `https://todos-758f8-default-rtdb.firebaseio.com/${id}/stask/${data.id}.json?auth=tMP42bwtqN09D5oxY12YkLsDCJZZEq9RWMGYGLNA`
+  );
+}
 
-// export default handlerSignInWithFB;
+export function postStaskDatabase(id, idStask, data) {
+  return axios.post(
+    `https://todos-758f8-default-rtdb.firebaseio.com/${id}/stask/${idStask}.json/?auth=tMP42bwtqN09D5oxY12YkLsDCJZZEq9RWMGYGLNA`,
+    data
+  );
+}

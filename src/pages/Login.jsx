@@ -20,7 +20,7 @@ class Login extends React.Component {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then((result) => {
-        logInHandler({ email: result.user.email });
+        logInHandler({ id: result.user.uid });
       })
       .catch((e) => {
         alert(e.code);
@@ -28,16 +28,7 @@ class Login extends React.Component {
   };
 
   formView = (props) => {
-    const {
-      // isSubmitting,
-      errors,
-      handleSubmit,
-      handleChange,
-      touched,
-      handleBlur,
-    } = props;
-    // const a = {};
-    // console.log(a.b.c);
+    const { errors, handleSubmit, handleChange, touched, handleBlur } = props;
     return (
       <form onSubmit={handleSubmit}>
         <div className="">
@@ -93,13 +84,7 @@ class Login extends React.Component {
 
   handlerLoginWithFB = async (result) => {
     const { signInWithFB } = this.props;
-    signInWithFB(result.user.email);
-  };
-
-  onClickSignInWithEmail = () => {
-    firebaseConfig.firebase
-      .auth()
-      .createUserWithEmailAndPassword("example@gmail.com", "123456789");
+    signInWithFB({ id: result.user.uid });
   };
 
   render() {
@@ -154,6 +139,7 @@ Login.defaultProps = {
   signInWithFB: undefined,
   authState: {
     signIn: false,
+    id: null,
   },
   location: {
     state: {
@@ -166,6 +152,7 @@ Login.propTypes = {
   signInWithFB: PropTypes.func,
   authState: PropTypes.exact({
     signIn: PropTypes.bool,
+    id: PropTypes.string,
   }),
   location: PropTypes.exact({
     state: PropTypes.exact({
