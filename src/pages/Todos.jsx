@@ -1,15 +1,20 @@
+/* eslint-disable prefer-template */
+/* eslint-disable prettier/prettier */
+/* eslint-disable import/named */
 import React from "react";
 import PropTypes from "prop-types";
-import { uuid } from "uuidv4";
+import uuid from "react-uuid";
 import classnames from "classnames";
 import { connect } from "react-redux";
 import {
   addStask,
+  putFullStask,
   getStask,
   deleteStask,
   tick,
   tickAll,
   deleteAllStask,
+  tickSave,
 } from "../store/actions/staskActions";
 import { signOutAction } from "../store/actions/authActions";
 
@@ -23,9 +28,18 @@ class App extends React.Component {
   }
 
   UNSAFE_componentWillMount() {
-    const { getStaskHandler } = this.props;
-    getStaskHandler();
+    const { getStaskHandler, authState } = this.props;
+    getStaskHandler(authState.id);
   }
+
+  onClickSaveAllBtn = () => {
+    const { putFullStaskHandler, staskLocalState, authState, staskFirebaseState } = this.props;
+    const staskState = {
+      ...staskLocalState.data,
+      ...staskFirebaseState.data,
+    };
+    putFullStaskHandler(authState.id, staskState);
+  };
 
   header = (...props) => <div className="display-3 mt-3">{props[0].name}</div>;
 
@@ -36,6 +50,7 @@ class App extends React.Component {
         id: uuid(),
         name: e.target.value,
         isTick: false,
+        savedFirebase: false,
       };
       addStaskHandler(data);
       e.target.value = "";
@@ -45,7 +60,12 @@ class App extends React.Component {
   todoTable = (...props) => {
     const [dataProps] = props;
     const { modeShowComplete, modeShowNotComplete } = this.state;
-    const { tickAllHandler, deleteAllStaskHandler } = this.props;
+    const {
+      tickAllHandler,
+      deleteAllStaskHandler,
+      authState,
+      staskFirebaseState,
+    } = this.props;
     const everyTrue = Object.values(dataProps.data).every(
       (item) => item.isTick === true
     );
@@ -64,7 +84,15 @@ class App extends React.Component {
       <div className="todo-list">
         <div className="d-flex align-items-end border-bottom w-100">
           <div
-            onClick={() => tickAllHandler()}
+            onClick={() => {
+              tickAllHandler(
+                authState.id,
+                {
+                  ...staskFirebaseState.data,
+                },
+                everyTrue
+              );
+            }}
             aria-hidden="true"
             className="d-block my-auto"
           >
@@ -85,23 +113,44 @@ class App extends React.Component {
           {!dataMode
             ? Object.values(dataProps.data).map((item) => {
                 return (
-                  <div key={item.id}>
-                    {this.showStask(item.id, item.isTick, item.name)}
+                  <div
+                    key={item.id}
+                    className={classnames({ "bg-success": item.savedFirebase })}
+                  >
+                    {this.showStask(
+                      item.id,
+                      item.isTick,
+                      item.name,
+                      item.savedFirebase
+                    )}
                   </div>
                 );
               })
             : dataMode.map((item) => {
                 return (
-                  <div key={item.id}>
-                    {this.showStask(item.id, item.isTick, item.name)}
+                  <div
+                    key={item.id}
+                    className={classnames({ "bg-success": item.savedFirebase })}
+                  >
+                    {this.showStask(
+                      item.id,
+                      item.isTick,
+                      item.name,
+                      item.savedFirebase
+                    )}
                   </div>
                 );
               })}
           <div className="d-flex align-items-center justify-content-between font-size-20">
-            <div style={{ width: "150px", textAlign: "center" }}>
-              {`${Object.values(dataProps.data).length} `}
-              item
-            </div>
+            <button
+              onClick={this.onClickSaveAllBtn}
+              style={{ width: "100px", textAlign: "center" }}
+              aria-hidden="true"
+              type="button"
+              className="btn btn-primary mx-3"
+            >
+              Save All
+            </button>
             <div className="d-flex">
               <div
                 onClick={() => {
@@ -150,9 +199,13 @@ class App extends React.Component {
 
             <div
               style={{ width: "150px", textAlign: "center" }}
-              onClick={() => deleteAllStaskHandler()}
+              onClick={() => {
+                deleteAllStaskHandler(authState.id, {
+                  ...staskFirebaseState.data,
+                });
+              }}
               aria-hidden="true"
-              className="py-3"
+              className="py-3 pointer"
             >
               Clear complete
             </div>
@@ -162,17 +215,28 @@ class App extends React.Component {
     );
   };
 
-  showStask = (id, isChecked, name) => {
-    const { tickCompleteHandler, deleteStaskHandler } = this.props;
+  showStask = (id, isChecked, name, saved) => {
+    const {
+      tickCompleteHandler,
+      deleteStaskHandler,
+      tickSaveHandler,
+      authState,
+    } = this.props;
     return (
       <div className="border-bottom w-100 font-size-25">
-        <div className="d-flex justify-content-between align-items-center mx-3 my-2">
+        <div className="d-flex justify-content-between align-items-center mx-3 py-2">
           <label htmlFor={`checkbox_${id}`} className="custom-checkbox">
             <input
               type="checkbox"
               name="checkbox"
               id={`checkbox_${id}`}
-              onChange={() => tickCompleteHandler(id)}
+              onChange={() => {
+                tickCompleteHandler(authState.id, {
+                  id,
+                  isTick: isChecked,
+                  name,
+                }, saved);
+              }}
               checked={isChecked}
             />
             <span className="checkmark" />
@@ -183,9 +247,32 @@ class App extends React.Component {
           >
             {name}
           </div>
+          <label htmlFor={`checkbox_save${id}`} className="custom-checkbox">
+            <input
+              type="checkbox"
+              name="checkbox_save"
+              id={`checkbox_save${id}`}
+              onChange={() => {
+                tickSaveHandler(authState.id, {
+                  id,
+                  isTick: isChecked,
+                  name,
+                }, saved);
+              }}
+              checked={saved}
+            />
+            <span className="checkmark" />
+          </label>
           <i
             className="fas fa-times pointer"
-            onClick={() => deleteStaskHandler(id)}
+            onClick={() => {
+              deleteStaskHandler(authState.id, {
+                id,
+                isTick: isChecked,
+                name,
+                savedFirebase: saved,
+              });
+            }}
             aria-hidden="true"
           />
         </div>
@@ -193,16 +280,30 @@ class App extends React.Component {
     );
   };
 
+  convertFirebaseData = (data, value) => {
+    const resultData = {...data}
+    if(Object.values(resultData).length !== 0) {
+    Object.values(resultData).forEach((item) => {
+      resultData[item.id].savedFirebase = value;
+    });}
+    return resultData
+  }
+
   render() {
-    const { staskState, logOut } = this.props;
-    // console.log(Object.keys(staskState.data));
-    // if (!staskState?.data) {
-    //   return <Loading/>
-    // }
+    const { staskLocalState, logOut, staskFirebaseState } = this.props;
+    const customStaskFirebaseState = this.convertFirebaseData(staskFirebaseState.data, true)
+    const customStaskLocalState = this.convertFirebaseData(staskLocalState.data, false)
+    const staskState = {
+      ...customStaskLocalState,
+      ...customStaskFirebaseState,
+    };
+    if (staskFirebaseState.loading) {
+      return <div className="display-2 text-center">Loading</div>;
+    }
     return (
       <div className="d-flex align-items-center flex-column">
         <this.header name="Todos" />
-        <this.todoTable data={staskState.data || []} />
+        <this.todoTable data={staskState || {}} />
         <div
           className="btn btn-danger log-out"
           onClick={logOut}
@@ -216,27 +317,34 @@ class App extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  staskState: state.staskState,
+  staskLocalState: state.staskLocalState,
+  staskFirebaseState: state.staskFirebaseState,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getStaskHandler: () => {
-    dispatch(getStask());
+  getStaskHandler: (data) => {
+    dispatch(getStask(data));
+  },
+  putFullStaskHandler: (id, data) => {
+    dispatch(putFullStask(id, data));
   },
   addStaskHandler: (data) => {
     dispatch(addStask(data));
   },
-  deleteStaskHandler: (data) => {
-    dispatch(deleteStask(data));
+  deleteStaskHandler: (id, data) => {
+    dispatch(deleteStask(id, data));
   },
-  tickCompleteHandler: (data) => {
-    dispatch(tick(data));
+  tickCompleteHandler: (id, data, saved) => {
+    dispatch(tick(id, data, saved));
   },
-  tickAllHandler: () => {
-    dispatch(tickAll());
+  tickSaveHandler: (id, data, saved) => {
+    dispatch(tickSave(id, data, saved));
   },
-  deleteAllStaskHandler: () => {
-    dispatch(deleteAllStask());
+  tickAllHandler: (id, data, everyTrue) => {
+    dispatch(tickAll(id, data, everyTrue));
+  },
+  deleteAllStaskHandler: (id, data) => {
+    dispatch(deleteAllStask(id, data));
   },
   logOut: () => {
     dispatch(signOutAction());
@@ -244,7 +352,11 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 App.defaultProps = {
-  staskState: {},
+  staskLocalState: {},
+  authState: {
+    signIn: false,
+    id: null,
+  },
   logOut: undefined,
   getStaskHandler: undefined,
   deleteAllStaskHandler: undefined,
@@ -252,10 +364,24 @@ App.defaultProps = {
   deleteStaskHandler: undefined,
   tickCompleteHandler: undefined,
   addStaskHandler: undefined,
+  putFullStaskHandler: undefined,
+  tickSaveHandler: undefined,
+  staskFirebaseState: {
+    loading: false,
+    data: {}
+  },
 };
 
 App.propTypes = {
-  staskState: PropTypes.objectOf(PropTypes.object),
+  staskLocalState: PropTypes.objectOf(PropTypes.object),
+  staskFirebaseState: PropTypes.exact({
+    loading: PropTypes.bool,
+    data: PropTypes.objectOf(PropTypes.object)
+  }),
+  authState: PropTypes.exact({
+    signIn: PropTypes.bool,
+    id: PropTypes.string,
+  }),
   logOut: PropTypes.func,
   getStaskHandler: PropTypes.func,
   deleteAllStaskHandler: PropTypes.func,
@@ -263,6 +389,8 @@ App.propTypes = {
   deleteStaskHandler: PropTypes.func,
   tickCompleteHandler: PropTypes.func,
   addStaskHandler: PropTypes.func,
+  putFullStaskHandler: PropTypes.func,
+  tickSaveHandler: PropTypes.func,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

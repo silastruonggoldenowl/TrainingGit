@@ -86,12 +86,14 @@ function RouteConfig(props) {
 RouteConfig.defaultProps = {
   authState: {
     signIn: false,
+    id: null,
   },
   routes: undefined,
 };
 RouteConfig.propTypes = {
   authState: PropTypes.exact({
     signIn: PropTypes.bool,
+    id: PropTypes.string,
   }),
   routes: PropTypes.objectOf(PropTypes.object),
 };

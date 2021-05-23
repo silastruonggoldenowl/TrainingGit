@@ -80,7 +80,7 @@ class Register extends React.Component {
       .signInWithPopup(firebaseConfig.FBProvider)
       .then(this.handlerLoginWithFB)
       .catch((error) => {
-        console.log(error);
+        alert(error);
       });
   };
 

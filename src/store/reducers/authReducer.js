@@ -3,15 +3,17 @@ import AUTH from "../constans/authConstans";
 // import firebaseConfig from "../../firebaseConfig";
 
 function handlerLogIn(state, data) {
-  if (data.email) {
+  if (data.id) {
     return {
       ...state,
       signIn: true,
+      id: data.id,
     };
   }
   return {
     ...state,
     signIn: false,
+    id: null,
   };
 }
 
@@ -19,6 +21,7 @@ function handlerLogOut(state) {
   return {
     ...state,
     signIn: false,
+    id: null,
   };
 }
 
@@ -26,19 +29,6 @@ function handlerLogUp(state) {
   return {
     ...state,
     signIn: true,
-  };
-}
-
-function handlerSignInWithFB(state, data) {
-  if (data) {
-    return {
-      ...state,
-      signIn: true,
-    };
-  }
-  return {
-    ...state,
-    signIn: false,
   };
 }
 
@@ -51,7 +41,7 @@ export default function authReducer(state = { signIn: false }, action) {
     case AUTH.SIGN_UP:
       return handlerLogUp(state);
     case AUTH.SIGN_IN_WITH_FB:
-      return handlerSignInWithFB(state, action.data);
+      return handlerLogIn(state, action.data);
     default:
       return state;
   }
